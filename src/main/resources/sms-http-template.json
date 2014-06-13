@@ -1,0 +1,19 @@
+{
+ "outgoing" : {
+    "request":{
+        "urlPath": "http://41.191.245.72/sendsms.php",
+        "queryParameters":{
+            "to": "$recipients" ,
+            "from": "$message",
+
+        },
+        "recipientsSeparator": "+"
+    },
+    "response": {
+        "success": "Received"
+    }
+ }
+}
+
+}
+
