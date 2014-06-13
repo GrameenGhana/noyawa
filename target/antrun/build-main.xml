@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main">
+  <exec executable="curl">
+    <arg value="-s"/>
+    <arg value="-S"/>
+    <arg value="-X"/>
+    <arg value="DELETE"/>
+    <arg value="http://${couchdb.server}:${couchdb.port}/noyawa-integration-test"/>
+  </exec>
+</target>
+</project>

@@ -1,0 +1,6 @@
+#surefire
+#Fri Jun 13 16:23:10 GMT 2014
+maven.ext.class.path=/home/liman/netbeans-8.0/java/maven-nblib/netbeans-eventspy.jar
+user.dir=/home/liman/noyawa-master
+localRepository=/home/liman/.m2/repository
+basedir=/home/liman/noyawa-master
