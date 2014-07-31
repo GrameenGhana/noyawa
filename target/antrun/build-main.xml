@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project name="maven-antrun-" default="main"  >
 <target name="main">
-  <exec executable="curl">
-    <arg value="-s"/>
-    <arg value="-S"/>
-    <arg value="-X"/>
-    <arg value="DELETE"/>
-    <arg value="http://${couchdb.server}:${couchdb.port}/noyawa-integration-test"/>
-  </exec>
+  <echo message="Seed data loading: START"/>
+  <property name="compile_classpath" refid="maven.compile.classpath"/>
+  <java classname="org.motechproject.noyawa.tools.SetupSeedData">
+    <classpath>
+      <pathelement path="${compile_classpath}"/>
+    </classpath>
+  </java>
+  <echo message="Seed data loading: END"/>
 </target>
 </project>

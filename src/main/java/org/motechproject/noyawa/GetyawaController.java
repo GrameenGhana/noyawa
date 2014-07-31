@@ -3,6 +3,7 @@ package org.motechproject.noyawa;
 import java.sql.ResultSet;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import org.json.JSONException;
@@ -22,6 +23,7 @@ import org.motechproject.noyawa.repository.AllSubscriptions;
 import org.motechproject.noyawa.service.SMSHandler;
 import org.motechproject.noyawa.service.SubscriptionService;
 import org.motechproject.noyawa.sms.SMSDouble;
+import org.motechproject.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,11 +156,10 @@ public class GetyawaController {
          return gender + " " + age + " " + educaLevel ;  */
     }
 
-    @Autowired
-    AllSubscribers allSubscribers;
+    // @Autowired
+    //AllSubscribers allSubscribers;
     @Autowired
     private YawaAlgoSubscription yawaAlgoSubscription;
-   
 
     private RegistrationDao registrationDao = new RegistrationDao();
 
@@ -168,14 +169,9 @@ public class GetyawaController {
 
         logger.info("Firing to couchDb");
 
-        String lphone = null;
-        String lgender = null;
-        String lage = null;
-        String ledulevel = null;
-        String lstatus = null;
 
-        List<Subscriber> listOfSubscribers = null;
-        List<Subscription> listOfSubscription = null;
+       // List<Subscriber> listOfSubscribers = null;
+        //List<Subscription> listOfSubscription = null;
 
         boolean success = false;
 
@@ -202,46 +198,53 @@ public class GetyawaController {
                 }
             }
 
-            if(resultSet != null){
-                listOfSubscribers = allSubscribers.getAll();
-                listOfSubscription = allSubscriptions.getAll();
-            }
-            
+//            if (resultSet != null) {
+//                listOfSubscribers = allSubscribers.getAll();
+//                listOfSubscription = allSubscriptions.getAll();
+//            }
+
+            ArrayList<MySqlSubscriber> arrayList = new ArrayList<MySqlSubscriber>();
+            //logger.info("List of subscribers:" + listOfSubscribers.size());
             while (resultSet.next()) {
-                lphone = resultSet.getString("client_number");
-                lgender = resultSet.getString("client_gender");
-                lage = resultSet.getString("client_age");
-                ledulevel = resultSet.getString("client_education_level");
-                lstatus = resultSet.getString("status");
+          
+                arrayList.add(new MySqlSubscriber(resultSet.getString("client_number"),resultSet.getString("client_gender"), resultSet.getString("client_age"), resultSet.getString("client_education_level"), resultSet.getString("status")));
+
+            }
+
+            if(!arrayList.isEmpty()) {
+                
+                logger.info("MySql Subscribers List : "+arrayList.size());
+                
+                
+             for(MySqlSubscriber c : arrayList) {
+                 
+              //  for (Subscriber s : listOfSubscribers) {
+               //     if (!s.getNumber().equalsIgnoreCase(c.number)) {
+                        Subscriber subscriber = new Subscriber();
+                        subscriber.setNumber(c.number);
+                        logger.info("Subscriber saved in the db");
+               //     } else {
+               //         logger.error("Subscriber found in the db");
+                //    }
+               // }
+
+
+              //  for (Subscription sp : listOfSubscription) {
+               //     if (!sp.getSubscriber().getNumber().equalsIgnoreCase(c.number)) {
+                        yawaAlgoSubscription.SubscribeUserToCampaign(c.number, c.age, c.eduLevel, c.status);
+                        logger.info("Susbcription saved in the db");
+               //     } else {
+                //        logger.error("Susbcription not saved in the db");
+               //     }
+               // }
+
 
                 
-                logger.info("List of subscribers:" + listOfSubscribers.size());
 
-                for (Subscriber s : listOfSubscribers) {
-                    if (!s.getNumber().equalsIgnoreCase(lphone.trim())) {
-                        Subscriber subscriber = new Subscriber();
-                        subscriber.setNumber(lphone.trim());
-                    } else {
-                        logger.error("Subscriber found in the db");
-                    }
-                }
-
-                logger.info("Subscribers  are done");
-
-               
-
-                for (Subscription sp : listOfSubscription) {
-                    if (!sp.getSubscriber().getNumber().equalsIgnoreCase(lphone.trim())) {
-                        yawaAlgoSubscription.SubscribeUserToCampaign(lphone, lage, ledulevel, lstatus);
-                    } else {
-                        logger.error("Susbcription already done");
-                    }
-                }
-
-                logger.info("Subscriptions  are done");
-
-                success = true;
-
+            }
+             
+             success = true;
+             
             }
         } catch (Exception e) {
 
@@ -251,11 +254,70 @@ public class GetyawaController {
         }
 
         if (success) {
-              return "Work is done, yeah !!!";
+            return "Work is done, yeah !!!";
         } else {
-              return "Something went wrong, check and rerun script !!!";
+            return "Something went wrong, check and rerun script !!!";
         }
-        
 
     }
+    
+    
+    
+    
+    @RequestMapping(value = "/fireAmSorry", method = RequestMethod.GET)
+    public @ResponseBody
+    String fireAmSorry() {
+       
+        
+        try {
+            ResultSet resultSet = null;
+
+                logger.info("Firing  am sorry message to all subscbribers .....");
+                resultSet = registrationDao.getAllClients();
+                resultSet.last();
+                int total = resultSet.getRow();
+                logger.info("Total number of subscbribers in mysql -> " + total);
+
+                resultSet.beforeFirst();
+
+                String sorryMsg = "We know it is frustrating whn ur messages dont come on time but thank u 4 ur patience "
+                                + "as we have worked 2 improve the No Yawa message system. We still dey 4 u!";
+                
+            while (resultSet.next()) {
+          
+                sMSDouble.outingMessage(resultSet.getString("client_number"), sorryMsg) ;
+                
+            }
+            
+            return "Finished sending am sorry message to all subscribers @ " + DateUtil.now() ;
+          
+        } catch (Exception e) {
+            
+            return "There is a problem somewhere - > "+e.getMessage();
+        }
+         
+    }
+    
+    
+    // class to keep  subscriber details from mysql
+    public class MySqlSubscriber {
+
+        private String number;
+        private String gender;
+        private String age;
+        private String eduLevel;
+        private String status;
+
+        public MySqlSubscriber(String number, String gender, String age, String eduLevel, String status) {
+            this.number = number;
+            this.gender = gender;
+            this.age = age;
+            this.eduLevel = eduLevel;
+            this.status = status;
+        }
+
+    }
+    
+    
+    
 }

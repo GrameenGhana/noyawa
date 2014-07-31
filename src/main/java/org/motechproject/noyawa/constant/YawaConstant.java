@@ -101,7 +101,8 @@ public class YawaConstant {
 	public String getClientForSms = "SELECT client_number,client_gender,client_age,client_education_level,status FROM clients_sms_registration WHERE client_number=?";
 	public String validateClientSms ="SELECT client_number FROM clients_sms_registration WHERE client_number=?";
         public String getAllClients = "SELECT client_number,client_gender,client_age,client_education_level,status FROM clients_sms_registration WHERE status='Completed'";
-        
+          public String getAllClients = "SELECT client_number,client_gender,client_age,client_education_level,status FROM clients_sms_registration WHERE status='Completed'";
+        public String smsLogInsert = "INSERT INTO smslog(direction,sender,receiver,message,message_type,status,created_at) values(?,?,?,?,?,?,?)";
     //Long Code Registration
     public String getClientLongCode ="UPDATE clients_sms_registration SET client_gender=?, client_age=?, client_education_level=?, status='LongCode' WHERE client_number=?";
 

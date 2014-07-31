@@ -19,12 +19,12 @@ public class AllProgramTypes extends MotechBaseRepository<ProgramType> {
     public ProgramType findByCampaignShortCode(String shortCode) {
         List<ProgramType> programTypes = getAll();
         String shortCodeLowerCase = shortCode.toLowerCase();
-        System.out.println("Passing ->"+shortCodeLowerCase);
+       // System.out.println("Passing ->"+shortCodeLowerCase);
         
         for (ProgramType programType : programTypes) {
             List<String> shortCodes = programType.getShortCodes();
             for (String code : shortCodes) {
-                System.out.println("Code:"+code);
+               // System.out.println("Code:"+code);
                 
                 if (code.toLowerCase().contains(shortCodeLowerCase))
                     return programType;

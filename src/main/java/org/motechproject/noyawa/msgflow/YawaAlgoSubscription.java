@@ -14,13 +14,14 @@ public class YawaAlgoSubscription {
 
     public void SubscribeUserToCampaign(String phone, String age, String edulevel, String status) throws Exception {
 
-        if (age == " " || edulevel == " ") {
+        if (age == " " || edulevel == " "  || age.isEmpty() || edulevel.isEmpty()) {
 
             System.out.println("Your registration is incomplete, kindly send start to short code 7005");
 
         } else {
 
-            if (Integer.parseInt(age) >= 15 && Integer.parseInt(age) <= 19) {
+            try {
+                if (Integer.parseInt(age) >= 15 && Integer.parseInt(age) <= 19) {
 
                 if (edulevel.toString().trim().matches("na".toString().trim()) || edulevel.toString().trim().matches("Na".toString().trim()) || edulevel.toString().trim().matches("NA".toString().trim())) {
                     incomingYawaMessage.processIncomingYawaMessage(phone, "ro 1");
@@ -30,6 +31,10 @@ public class YawaAlgoSubscription {
             } else if (Integer.parseInt(age) >= 20 && Integer.parseInt(age) <= 24) {
                 incomingYawaMessage.processIncomingYawaMessage(phone, "ri 1");
             }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+            
         }
 
     }
